@@ -29,9 +29,9 @@ class RolesAndPermissionsSeeder extends Seeder
             }
         }
         // Create roles and assign existing permissions
-        $admin = Role::firstOrCreate(['name' => 'Admin', 'guard_name' => 'admin']);
-        $manager = Role::firstOrCreate(['name' => 'Manager', 'guard_name' => 'admin']);
-        $employee = Role::firstOrCreate(['name' => 'Employee', 'guard_name' => 'admin']);
+        $admin = Role::firstOrCreate(['name' => 'Admin', 'guard_name' => 'web']);
+        $manager = Role::firstOrCreate(['name' => 'Manager', 'guard_name' => 'web']);
+        $employee = Role::firstOrCreate(['name' => 'Employee', 'guard_name' => 'web']);
 
         $admin->givePermissionTo(Permission::all());
         //$admin ->syncPermissions(Permission::all());
@@ -39,8 +39,8 @@ class RolesAndPermissionsSeeder extends Seeder
         $manager->givePermissionTo(['user.view', 'user.create']);
         $manager->givePermissionTo(['project.view', 'project.create', 'project.edit']);
 
-        $employee->givePermissionTo(['user.view']);
-        $employee->givePermissionTo(['project.view']);
+        //$employee->givePermissionTo(['user.view']);
+        $employee->givePermissionTo(['project.view', 'project.create', 'project.edit']);
 
         $user = User::where('id', 1)->first();
         if ($user) {

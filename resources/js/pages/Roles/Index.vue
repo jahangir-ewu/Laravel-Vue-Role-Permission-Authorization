@@ -6,8 +6,8 @@ import { toast } from 'vue3-toastify';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Users',
-        href: '/users',
+        title: 'Roles',
+        href: '/roles',
     },
 ];
 const form = useForm({
@@ -15,40 +15,40 @@ const form = useForm({
    
 
 const props = defineProps({
-    users: {
+    roles: {
         type: Array,
         required: true,
     },
 });
 
 function deleteItem(id) {
-    if (confirm('Are you sure you want to delete this user?')) {
-        form.delete(route('users.destroy', id), {
+    if (confirm('Are you sure you want to delete this role?')) {
+        form.delete(route('roles.destroy', id), {
             onSuccess: () => {
                 //Inertia.reload();
-                toast.success('User deleted successfully!');
+                toast.success('Role deleted successfully!');
 
             },
             onError: (errors) => {
-                console.error('Error deleting user:', errors);
+                console.error('Error deleting role:', errors);
             },
         });
-        //console.log(`User with ID ${userId} deleted`);
+        //console.log(`role with ID ${roleId} deleted`);
         //Inertia.reload();
-        // or use a toast notification to inform the user   
+        // or use a toast notification to inform the role   
     }
 }
 
 </script>
 
 <template>
-    <Head title="Users" />
+    <Head title="Roles" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex flex-col gap-6 p-6">
             <!-- Header Section -->
             <div class="flex justify-between items-center">
-                <h1 class="text-2xl font-semibold text-gray-800">User List</h1>
+                <h1 class="text-2xl font-semibold text-gray-800">Role List</h1>
                 <div class="flex gap-3">
                     <button class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-200 transition">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -56,8 +56,8 @@ function deleteItem(id) {
                         </svg>
                         Filter
                     </button>
-                    <Link href="/users/create" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition">
-                        + Create User
+                    <Link href="/roles/create" class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 transition">
+                        + Create Role
                     </Link>
                 </div>
             </div>
@@ -68,34 +68,41 @@ function deleteItem(id) {
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Roles</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No. Users</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Permissions</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        <tr v-for="user in users" :key="user.id">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ user.name }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ user.email }}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                <span v-for="role in user.roles" :key="role.id" class="inline-block bg-blue-100 text-blue-800 text-xs font-semibold mr-2 px-2.5 py-0.5 rounded-full">
-                                    {{ role.name }}
-                                </span>
+                        <tr v-for="role in roles" :key="role.id">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ role.name }}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">07</td>
+                           <td class="px-6 py-4 text-sm text-gray-900 w-1/3 align-top">
+                                <div class="flex flex-wrap gap-1">
+                                    <span
+                                        v-for="permission in role.permissions"
+                                        :key="permission.id"
+                                        class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full break-all"
+                                    >
+                                        {{ permission.name }}
+                                    </span>
+                                </div>
                             </td>
+
                             <td class ="px-6 py-4 whitespace-nowrap text-sm text-gray-900"> Status </td>
                             <!-- <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                <span :class="user.status ? 'text-green-600' : 'text-red-600'">
-                                    {{ user.status ? 'Active' : 'Inactive' }}
+                                <span :class="role.status ? 'text-green-600' : 'text-red-600'">
+                                    {{ role.status ? 'Active' : 'Inactive' }}
                                 </span>
                             </td> -->
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                <Link :href="`/users/${user.id}/edit`" class="text-blue-600 hover:text-blue-900">Edit</Link>
-                                <button @click="deleteItem(user.id)" class="text-red-600 hover:text-red-900 ml-4">Delete</button>
+                                <Link :href="`/roles/${role.id}/edit`" class="text-blue-600 hover:text-blue-900">Edit</Link>
+                                <button @click="deleteItem(role.id)" class="text-red-600 hover:text-red-900 ml-4">Delete</button>
                             </td>
                         </tr>
-                        <tr v-if="users.length === 0">
-                            <td colspan="3" class="text-center py-6 text-gray-500">No users found.</td>
+                        <tr v-if="roles.length === 0">
+                            <td colspan="3" class="text-center py-6 text-gray-500">No roles found.</td>
                         </tr>
                     </tbody>
                 </table>

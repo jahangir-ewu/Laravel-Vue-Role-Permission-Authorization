@@ -6,16 +6,20 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class UserController extends Controller
 {
+    use AuthorizesRequests;
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-       // Gate::authorize('viewAny', User::class);
-       $users = User::with('roles', 'permissions')->get();
+       $user =  auth()->user();
+       $this->authorize('view', $user);
+
+       $users = User::with('roles')->get();
 
         return Inertia::render('Users/Index', [
             'users' => $users,
@@ -27,7 +31,7 @@ class UserController extends Controller
      */
     public function create()
     {
-        // Gate::authorize('create', User::class);
+        $this->authorize('create');
         return Inertia::render('Users/Create');
     }
 
@@ -36,8 +40,7 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //gate::authorize('create', User::class);
-
+        $this->authorize('create');
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
@@ -66,8 +69,9 @@ class UserController extends Controller
      */
     public function edit(string $id)
     {
-        // Gate::authorize('update', User::class);
-        $user = User::with('roles', 'permission')->findOrFail($id);
+        $user = auth()->user();
+        $this->authorize('update', $user);
+        $user = User::with('roles')->findOrFail($id);
         $roles = Role::all();
         $permissions = Permission::all()->groupBy('group'); // assume 'group' column exists
 
@@ -83,7 +87,8 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        // Gate::authorize('update', User::class);
+        $user = auth()->user();
+        $this->authorize('update', $user);
         $user = User::findOrFail($id);
 
         $request->validate([
@@ -108,7 +113,8 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        //Gate::authorize('delete', User::class);
+        $user = auth()->user();
+        $this->authorize('delete', $user);
         $user = User::findOrFail($id);
         $user->delete();
         return redirect()->route('users.index')->with('success', 'User deleted successfully.');

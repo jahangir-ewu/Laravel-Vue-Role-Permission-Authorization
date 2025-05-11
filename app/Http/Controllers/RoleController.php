@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class RoleController extends Controller
 {
@@ -16,7 +17,20 @@ class RoleController extends Controller
 
     public function create()
     {
-        $permissions = Permission::all()->groupBy('group'); // assume 'group' column exists
+        //$permissions = Permission::all()->groupBy('group'); // assume 'group' column exists
+         $permissions = Permission::all()
+        ->groupBy(function ($permission) {
+            // Get the prefix before the first dot, e.g., "user" from "user.view"
+            return Str::before($permission->name, '.');
+        })
+        ->map(function ($group) {
+            return $group->map(function ($permission) {
+                return [
+                    'id' => $permission->id,
+                    'name' => $permission->name,
+                ];
+            });
+        });
         return inertia('Roles/Create', compact('permissions'));
     }
 
