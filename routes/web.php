@@ -21,7 +21,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     //Route::get('users/{user}/edit-roles', [UserController::class, 'editRoles'])->name('users.editRoles');
     //Route::put('users/{user}/roles', [UserController::class, 'updateRoles'])->name('users.updateRoles');
 
-    //Route::resource('roles', RoleController::class);
+    Route::resource('roles', RoleController::class);
     //Route::resource('permissions', PermissionController::class);
 
     Route::resource('projects', ProjectController::class);
@@ -30,3 +30,5 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
+require __DIR__.'/supplier.php'; //Can be added on RouteServiceProvider
+require __DIR__.'/customer.php'; //Can be added on RouteServiceProvider

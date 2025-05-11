@@ -15,7 +15,7 @@ class UserController extends Controller
     public function index()
     {
        // Gate::authorize('viewAny', User::class);
-       $users = User::latest()->get();
+       $users = User::with('roles', 'permissions')->get();
 
         return Inertia::render('Users/Index', [
             'users' => $users,
@@ -48,9 +48,8 @@ class UserController extends Controller
             'email' => $request->email,
             'password' => bcrypt($request->password),
         ]);
-        //$user->assignRole($request->role);
+        $user->assignRole($request->roles);
         return redirect()->route('users.index')->with('success', 'User created successfully.');
-
 
     }
 
@@ -67,7 +66,16 @@ class UserController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        // Gate::authorize('update', User::class);
+        $user = User::with('roles', 'permission')->findOrFail($id);
+        $roles = Role::all();
+        $permissions = Permission::all()->groupBy('group'); // assume 'group' column exists
+
+        return Inertia::render('Users/Edit', [
+            'user' => $user,
+            'roles' => $roles,
+            'permissions' => $permissions,
+        ]);
     }
 
     /**
@@ -75,7 +83,24 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        // Gate::authorize('update', User::class);
+        $user = User::findOrFail($id);
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'password' => 'nullable|string|min:8',
+        ]);
+
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => $request->password ? bcrypt($request->password) : $user->password,
+        ]);
+        $user->syncRoles($request->roles);
+        //$user->syncPermissions($request->permissions);
+
+        return redirect()->route('users.index')->with('success', 'User updated successfully.');
     }
 
     /**
@@ -83,6 +108,9 @@ class UserController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        //Gate::authorize('delete', User::class);
+        $user = User::findOrFail($id);
+        $user->delete();
+        return redirect()->route('users.index')->with('success', 'User deleted successfully.');
     }
 }

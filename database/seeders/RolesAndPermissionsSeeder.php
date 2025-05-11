@@ -20,20 +20,18 @@ class RolesAndPermissionsSeeder extends Seeder
         $permissionsGroups = [
             'user' => ['view','create','update','delete'],
             'project' => ['view', 'create', 'edit', 'delete'],
-            'role' => ['view','create','update','delete'],
-            'permission' => ['view','create','update','delete'],
+            //'role' => ['view','create','update','delete'],
+            //'permission' => ['view','create','update','delete'],
         ];
-        $permissions = [];
         foreach ($permissionsGroups as $group => $actions) {
             foreach ($actions as $action) {
-                //$permissions[] = $group . '-' . $action;
                 Permission::firstOrCreate(['name' => "$group.$action"]);
             }
         }
         // Create roles and assign existing permissions
-        $admin = Role::firstOrCreate(['name' => 'Admin']);
-        $manager = Role::firstOrCreate(['name' => 'Manager']);
-        $employee = Role::firstOrCreate(['name' => 'Employee']);
+        $admin = Role::firstOrCreate(['name' => 'Admin', 'guard_name' => 'admin']);
+        $manager = Role::firstOrCreate(['name' => 'Manager', 'guard_name' => 'admin']);
+        $employee = Role::firstOrCreate(['name' => 'Employee', 'guard_name' => 'admin']);
 
         $admin->givePermissionTo(Permission::all());
         //$admin ->syncPermissions(Permission::all());
@@ -46,7 +44,7 @@ class RolesAndPermissionsSeeder extends Seeder
 
         $user = User::where('id', 1)->first();
         if ($user) {
-            $user->assignRole('admin');
+            $user->assignRole(['admin', 'manager', 'employee']);
         } else {
             $user = User::factory()->create([
                 'name' => 'Admin',

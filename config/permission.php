@@ -27,6 +27,14 @@ return [
         'role' => Spatie\Permission\Models\Role::class,
 
     ],
+    /*
+     * The default guard name for the package.
+     *
+     * This is used when using the `HasRoles` trait.
+     *
+     * Feel free to set this to null if you do not want to use guards.
+     */
+    //'guards' => ['web', 'supplier', 'customer'], // Add guards here
 
     'table_names' => [
 

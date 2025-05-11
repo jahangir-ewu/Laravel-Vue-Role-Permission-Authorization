@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import AppLayout from '@/layouts/AppLayout.vue';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link } from '@inertiajs/vue3';
-
+import { Head, Link, useForm } from '@inertiajs/vue3';
+import { toast } from 'vue3-toastify';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -10,6 +10,9 @@ const breadcrumbs: BreadcrumbItem[] = [
         href: '/users',
     },
 ];
+const form = useForm({
+});
+   
 
 const props = defineProps({
     users: {
@@ -18,12 +21,22 @@ const props = defineProps({
     },
 });
 
-function confirmDelete(userId: number) {
+function deleteItem(id) {
     if (confirm('Are you sure you want to delete this user?')) {
-        // Perform the delete action here, e.g., send a request to the server
-        // For example:
-        // await axios.delete(`/users/${userId}`);
-        console.log(`User with ID ${userId} deleted`);
+        form.delete(route('users.destroy', id), {
+            onSuccess: () => {
+                // Optionally, you can reload the page or update the state
+                //Inertia.reload();
+                toast.success('User deleted successfully!');
+
+            },
+            onError: (errors) => {
+                console.error('Error deleting user:', errors);
+            },
+        });
+        //console.log(`User with ID ${userId} deleted`);
+        //Inertia.reload();
+        // or use a toast notification to inform the user   
     }
 }
 
@@ -66,7 +79,7 @@ function confirmDelete(userId: number) {
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ user.email }}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                 <Link :href="`/users/${user.id}/edit`" class="text-blue-600 hover:text-blue-900">Edit</Link>
-                                <button @click="confirmDelete(user.id)" class="text-red-600 hover:text-red-900 ml-4">Delete</button>
+                                <button @click="deleteItem(user.id)" class="text-red-600 hover:text-red-900 ml-4">Delete</button>
                             </td>
                         </tr>
                         <tr v-if="users.length === 0">

@@ -9,20 +9,27 @@ import {toast} from 'vue3-toastify';
 const breadcrumbs: BreadcrumbItem[] = [
     { title: 'Dashboard', href: '/' },
     { title: 'Users', href: '/users' },
-    { title: 'Create', current: true },
+    { title: 'Edit', current: true },
 ];
 
+const props = defineProps({
+    user: {
+        type: Object,
+        required: true,
+    },
+});
+
 const form = useForm({
-    name: '',
-    email: '',
+    name: props.user.name,
+    email: props.user.email,
     password: '',
 });
 
 function submit(){
-    form.post(route('users.store'), {
+    form.put(route('users.update', props.user.id), {
         onSuccess: () => {
             form.reset();
-            toast.success('User created successfully!');
+            toast.success('User updated successfully!');
         },
         onError: (errors) => {
             console.error('Form submission error:', errors);
@@ -34,13 +41,13 @@ function submit(){
 </script>
 
 <template>
-    <Head title="Create User" />
+    <Head title="Edit User" />
 
     <AppLayout :breadcrumbs="breadcrumbs">
         <div class="flex flex-col gap-6 p-6">
             <!-- Header Section -->
             <div class="flex justify-between items-center">
-                <h1 class="text-2xl font-semibold text-gray-800">Create User</h1>
+                <h1 class="text-2xl font-semibold text-gray-800">Edit User</h1>
                 <Link href="/users" class="text-sm text-blue-600 hover:underline">← Back to Users</Link>
             </div>
 

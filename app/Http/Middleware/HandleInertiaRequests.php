@@ -37,32 +37,45 @@ class HandleInertiaRequests extends Middleware
      * @return array<string, mixed>
      */
     public function share(Request $request): array
-    {
-        [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
+{
+    [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
 
-        return [
-            ...parent::share($request),
-            'name' => config('app.name'),
-            'quote' => ['message' => trim($message), 'author' => trim($author)],
-            'auth' => [
-                'user' => $request->user(),
-            ],
-            'ziggy' => [
-                ...(new Ziggy)->toArray(),
-                'location' => $request->url(),
-            ],
+    return [
+        ...parent::share($request),
+        'name' => config('app.name'),
+        'quote' => ['message' => trim($message), 'author' => trim($author)],
+        'ziggy' => [
+            ...(new Ziggy)->toArray(),
+            'location' => $request->url(),
+        ],
 
-            'auth' => function () {
-                $user = Auth::user();
-                return $user ? [
-                    'user' => $user,
-                    'roles' => $user->getRoleNames(),
-                    'permissions' => $user->getAllPermissions()->pluck('name'),
-                ] : null;
-            },
+        'auth' => function () {
+            $guards = ['web', 'customer', 'supplier'];
 
+            foreach ($guards as $guard) {
+                if (Auth::guard($guard)->check()) {
+                    $user = Auth::guard($guard)->user();
+                    $usesSpatie = method_exists($user, 'getRoleNames');
 
-            'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
-        ];
-    }
+                    return [
+                        'user' => $user,
+                        'roles' => $usesSpatie ? $user->getRoleNames() : [],
+                        'permissions' => $usesSpatie ? $user->getAllPermissions()->pluck('name') : [],
+                        'guard' => $guard,
+                    ];
+                }
+            }
+
+            return [
+                'user' => null,
+                'roles' => [],
+                'permissions' => [],
+                'guard' => null,
+            ];
+        },
+
+        'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+    ];
+}
+
 }
