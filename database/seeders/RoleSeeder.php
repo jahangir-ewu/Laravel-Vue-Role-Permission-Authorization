@@ -25,5 +25,10 @@ class RoleSeeder extends Seeder
         $employee = Role::firstOrCreate(['name' => 'customer', 'guard_name' => 'web']);
         $employee->givePermissionTo(['project.view', 'project.create', 'project.edit']);
         //$employee->givePermissionTo(['project.view', 'project.create', 'project.edit']);
+
+        // API Guard Role
+        $apiUserRole = Role::firstOrCreate(['name' => 'API User', 'guard_name' => 'api']);
+        $apiUserRole->givePermissionTo(['order_api.view', 'product_api.list', 'order_api.status_update']);
+        // Ensure these permissions were created in PermissionSeeder with the 'api' guard
     }
 }

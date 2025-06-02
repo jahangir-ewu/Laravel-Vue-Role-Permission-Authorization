@@ -49,7 +49,19 @@ class RoleController extends Controller
 
     public function edit(Role $role)
     {
-        $permissions = Permission::all()->groupBy('group');
+        $permissions = Permission::all()
+        ->groupBy(function ($permission) {
+            // Get the prefix before the first dot, e.g., "user" from "user.view"
+            return Str::before($permission->name, '.');
+        })
+        ->map(function ($group) {
+            return $group->map(function ($permission) {
+                return [
+                    'id' => $permission->id,
+                    'name' => $permission->name,
+                ];
+            });
+        });
         $rolePermissions = $role->permissions->pluck('name')->toArray();
         return inertia('Roles/Edit', compact('role', 'permissions', 'rolePermissions'));
     }

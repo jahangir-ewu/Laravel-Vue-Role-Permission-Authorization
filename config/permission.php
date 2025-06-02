@@ -34,7 +34,7 @@ return [
      *
      * Feel free to set this to null if you do not want to use guards.
      */
-    //'guards' => ['web', 'supplier', 'customer'], // Add guards here
+    'guards' => ['web', 'supplier', 'customer', 'api'], // Add guards here
 
     'table_names' => [
 

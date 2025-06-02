@@ -33,7 +33,7 @@ class RolesAndPermissionsSeeder extends Seeder
         $manager = Role::firstOrCreate(['name' => 'Manager', 'guard_name' => 'web']);
         $employee = Role::firstOrCreate(['name' => 'Employee', 'guard_name' => 'web']);
 
-        $admin->givePermissionTo(Permission::all());
+        $admin->givePermissionTo(Permission::where('guard_name', 'web')->get());
         //$admin ->syncPermissions(Permission::all());
 
         $manager->givePermissionTo(['user.view', 'user.create']);
